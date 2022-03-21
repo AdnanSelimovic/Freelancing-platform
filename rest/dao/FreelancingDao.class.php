@@ -28,20 +28,21 @@ class FreelancingDao{
 
   // Method used to add Freelancing objects to the database
   public function add($description, $created){
-    $stmt = $this->conn->prepare("INSERT INTO freelancingapps (description, created) VALUES ('$description', '$created')");
-    $stmt->execute();
+    $stmt = $this->conn->prepare("INSERT INTO freelancingapps (description, created) VALUES (:description, :created)");
+    $stmt->execute(['description' => $description, 'created' => $created]);
   }
 
   // Delete freelancingapps record from the SQLiteDatabase
   public function delete($id){
-    $stmt = $this->conn->prepare("DELETE FROM freelancingapps where id=$id");
+    $stmt = $this->conn->prepare("DELETE FROM freelancingapps where id=:id");
+    $stmt->bindParam(':id', $id); //SQL injection prevention
     $stmt->execute();
   }
 
   // Update freelancingapps record
   public function update($id, $description, $created){
-    $stmt = $this->conn->prepare("UPDATE freelancingapps SET description='$description', created='$created' WHERE id=$id");
-    $stmt->execute();
+    $stmt = $this->conn->prepare("UPDATE freelancingapps SET description=:description, created=:created WHERE id=:id");
+    $stmt->execute(['id' => $id, 'description' => $description, 'created' => $created]);
   }
 
 }
