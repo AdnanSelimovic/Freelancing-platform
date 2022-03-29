@@ -7,35 +7,40 @@ error_reporting(E_ALL);
 require_once 'dao/FreelancingDao.class.php';
 require_once '../vendor/autoload.php';
 
+Flight::register('freelancingDao', 'FreelancingDao');
+
+
 
 // CRUD Operations for freelancing entity
 
 // List all freelancingapps
 Flight::route('GET /freelancingapps', function(){
-  $dao = new FreelancingDao();
-  $freelancingapps = $dao->get_all();
-  Flight::json($freelancingapps);
+  Flight::json(Flight::freelancingDao()->get_all());
 });
 
 // List invdividual freelancingapps
 Flight::route('GET /freelancingapps/@id', function($id){
-  $dao = new FreelancingDao();
-  $freelancingapps = $dao->get_by_id($id);
-  Flight::json($freelancingapps);
+  Flight::json(Flight::freelancingDao()->get_by_id($id));
 });
 
 // add freelancingapp
 Flight::route('POST /freelancingapps', function(){
-  $dao = new FreelancingDao();
-  $request = Flight::request();
-  print_r($request);
-  // print_r($request->data->getData());
-  // Flight::json($freelancingapps);
+  Flight::json(Flight::freelancingDao()->add(Flight::request()->data->getData()));
 });
 
 // update freelancingapp
+Flight::route('PUT /freelancingapps/@id', function($id){
+  $data = Flight::request()->data->getData();
+  $data['id'] = $id;
+  FLight::freelancingDao()->update($data); 
+  Flight::json($data);
+});
 
 // delete freelancingapp
+Flight::route('DELETE /freelancingapps/@id', function($id){
+  Flight::freelancingDao()->delete($id);
+  Flight::json(["message" => "deleted"]);
+});
 
 Flight::start();
 

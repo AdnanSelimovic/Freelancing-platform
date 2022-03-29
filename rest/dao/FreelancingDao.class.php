@@ -33,9 +33,11 @@ class FreelancingDao{
   }
 
   // Method used to add Freelancing objects to the database
-  public function add($description, $created){
+  public function add($freelancing){
     $stmt = $this->conn->prepare("INSERT INTO freelancingapps (description, created) VALUES (:description, :created)");
-    $stmt->execute(['description' => $description, 'created' => $created]);
+    $stmt->execute($freelancing);
+    $freelancing['id'] = $this->conn->lastInsertId();
+    return $freelancing;
   }
 
   // Delete freelancingapps record from the SQLiteDatabase
@@ -46,9 +48,9 @@ class FreelancingDao{
   }
 
   // Update freelancingapps record
-  public function update($id, $description, $created){
+  public function update($freelancing){
     $stmt = $this->conn->prepare("UPDATE freelancingapps SET description=:description, created=:created WHERE id=:id");
-    $stmt->execute(['id' => $id, 'description' => $description, 'created' => $created]);
+    $stmt->execute($freelancing);
   }
 
 }
