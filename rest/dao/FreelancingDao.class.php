@@ -23,7 +23,13 @@ class FreelancingDao{
     $stmt = $this->conn->prepare("SELECT * FROM freelancingapps");
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 
+  public function get_by_id($id){
+    $stmt = $this->conn->prepare("SELECT * FROM freelancingapps WHERE id = :id");
+    $stmt->execute(['id' => $id]);
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return @reset($result);
   }
 
   // Method used to add Freelancing objects to the database
