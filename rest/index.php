@@ -32,8 +32,7 @@ Flight::route('POST /freelancingapps', function(){
 Flight::route('PUT /freelancingapps/@id', function($id){
   $data = Flight::request()->data->getData();
   $data['id'] = $id;
-  FLight::freelancingDao()->update($data); 
-  Flight::json($data);
+  FLight::json(Flight::freelancingDao()->update($data));
 });
 
 // delete freelancingapp

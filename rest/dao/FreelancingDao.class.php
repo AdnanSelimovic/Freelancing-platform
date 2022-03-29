@@ -51,6 +51,7 @@ class FreelancingDao{
   public function update($freelancing){
     $stmt = $this->conn->prepare("UPDATE freelancingapps SET description=:description, created=:created WHERE id=:id");
     $stmt->execute($freelancing);
+    return $freelancing;
   }
 
 }
