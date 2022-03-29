@@ -23,26 +23,19 @@ Flight::route('GET /freelancingapps/@id', function($id){
   $freelancingapps = $dao->get_by_id($id);
   Flight::json($freelancingapps);
 });
+
 // add freelancingapp
+Flight::route('POST /freelancingapps', function(){
+  $dao = new FreelancingDao();
+  $request = Flight::request();
+  print_r($request);
+  // print_r($request->data->getData());
+  // Flight::json($freelancingapps);
+});
 
 // update freelancingapp
 
 // delete freelancingapp
-Flight::route('/', function(){
-});
-
-Flight::route('/adnan/@name', function($name){
-  echo "hello ". $name;
-});
-
-Flight::route('/adna', function(){
-  echo "hello adna";
-});
-
-Flight::route('/stara', function(){
-  echo "hello stara";
-});
-
 
 Flight::start();
 
