@@ -64,6 +64,7 @@
 <script src="js/jquery-3.6.0.min.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
 <script src="js/jquery.validate.min.js"></script>
+<script src="js/freelancing-service.js"></script>
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -80,7 +81,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary save-freelancing-button" onclick="saveFreelancing()">Save changes</button>
+        <button type="button" class="btn btn-primary save-freelancing-button" onclick="FreelancingService.update()">Save changes</button>
       </div>
     </div>
   </div>
@@ -116,123 +117,7 @@
 
 <script>
 
-  $('#addFreelancingForm').validate({
-    submitHandler: function(form) {
-      var freelancing = Object.fromEntries((new FormData(form)).entries());
-      $.ajax({
-        url: 'rest/freelancingapps/',
-        type: 'POST',
-        data: JSON.stringify(freelancing),
-        contentType: "application/json",
-        dataType: "json",
-        success: function(result) {
-          $("freelancing-list").html('<div class="spinning-border" role="status"> <span class="sr-only"> </span> </div>');
-          getFreelancings(); // performance optimization
-          console.log(result);
-          $("#addFreelancingModal").modal("hide");
-        }
-      });
-    }
-  });
-
-  getFreelancings();
-
-  function getFreelancings(){
-    $.get("rest/freelancingapps", function(data) {
-
-      $("#freelancing-list").html("");
-
-      var html = "";
-      for (let i = 0; i < data.length; i++) {
-        html += `
-        <div class="col-lg-4">
-          <h2>`+ data[i].created +`</h2>
-          <p>`+ data[i].description +`</p>
-          <p>
-            <div class="btn-group" role="group">
-              <button type="button" class="btn btn-primary freelancing-button" onclick="showModal(`+data[i].id+`)">Edit</button>
-              <button type="button" class="btn btn-danger freelancing-button" onclick="deleteFreelancing(`+data[i].id+`)">Delete</button>
-            </div>
-          </p>
-        </div> `;
-      }
-      $("#freelancing-list").html(html);
-
-      console.log(data);
-      // alert("Load was performed.");
-    });
-  }
-
-  function showModal(id){
-    $('.freelancing-button').attr('disabled', true);
-    $.get('rest/freelancingapps/'+id, function(data){
-      console.log(data);
-      $("#description").val(data.description);
-      $("#id").val(data.id);
-      $("#created").val(data.created);
-      $("#exampleModal").modal("show");
-      $('.freelancing-button').attr('disabled', false);
-    })
-  }
-
-  function saveFreelancing(){
-
-    $('.save-freelancing-button').attr('disabled', true);
-    var freelancing = {};
-    freelancing.description = $('#description').val();
-    freelancing.created = $('#created').val();
-
-    $.ajax({
-      url: 'rest/freelancingapps/'+$('#id').val(),
-      type: 'PUT',
-      data: JSON.stringify(freelancing),
-      contentType: "application/json",
-      dataType: "json",
-      success: function(result) {
-        $("#exampleModal").modal("hide");
-        $('.save-freelancing-button').attr('disabled', false);
-        $("freelancing-list").html('<div class="spinning-border" role="status"> <span class="sr-only"> </span> </div>');
-        getFreelancings(); // performance optimization
-        console.log(result);
-      }
-    });
-
-    console.log(freelancing);
-  }
-
-  function deleteFreelancing(id){
-    $('.freelancing-button').attr('disabled', true);
-    $.ajax({
-      url: 'rest/freelancingapps/'+id,
-      type: 'DELETE',
-      success: function(result) {
-        $("freelancing-list").html('<div class="spinning-border" role="status"> <span class="sr-only"> </span> </div>');
-        getFreelancings();
-      }
-    });
-  }
-
-/* addFreelancing
-  function addFreelancing(){
-    var freelancing = {};
-    freelancing.description = $('#add_description').val();
-    freelancing.created = $('#add_created').val();
-
-    $.ajax({
-      url: 'rest/freelancingapps/',
-      type: 'POST',
-      data: JSON.stringify(freelancing),
-      contentType: "application/json",
-      dataType: "json",
-      success: function(result) {
-        $("freelancing-list").html('<div class="spinning-border" role="status"> <span class="sr-only"> </span> </div>');
-        getFreelancings(); // performance optimization
-        console.log(result);
-        $("#addFreelancingModal").modal("hide");
-      }
-    });
-  }
-*/
+  FreelancingService.init();
 
 </script>
 
