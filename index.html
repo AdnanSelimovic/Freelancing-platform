@@ -55,36 +55,69 @@
 
 <!-- ajax get request from API -->
 <script>
-  $.get("rest/freelancingapps", function(data) {
 
-    $("#freelancing-list").html("");
+  getFreelancings();
 
-    var html = "";
-    for (let i = 0; i < data.length; i++) {
-      html += `
-      <div class="col-lg-4">
-        <h2>`+ data[i].created +`</h2>
-        <p>`+ data[i].description +`</p>
-        <p>
-          <button type="button" class="btn btn-primary" onclick="showModal(`+data[i].id+`)">
-            Launch demo modal
-          </button>
-        </p>
-      </div> `;
-    }
-    $("#freelancing-list").html(html);
+  function getFreelancings(){
+    $.get("rest/freelancingapps", function(data) {
 
-    console.log(data);
-    // alert("Load was performed.");
-  });
+      $("#freelancing-list").html("");
+
+      var html = "";
+      for (let i = 0; i < data.length; i++) {
+        html += `
+        <div class="col-lg-4">
+          <h2>`+ data[i].created +`</h2>
+          <p>`+ data[i].description +`</p>
+          <p>
+            <button type="button" class="btn btn-primary freelancing-button" onclick="showModal(`+data[i].id+`)">
+              Launch demo modal
+            </button>
+          </p>
+        </div> `;
+      }
+      $("#freelancing-list").html(html);
+
+      console.log(data);
+      // alert("Load was performed.");
+    });
+  }
 
   function showModal(id){
+    $('.freelancing-button').attr('disabled', true);
     $.get('rest/freelancingapps/'+id, function(data){
       console.log(data);
-      // $("#exampleModal .modal-body").html(id);
       $("#description").val(data.description);
+      $("#id").val(data.id);
+      $("#created").val(data.created);
       $("#exampleModal").modal("show");
+      $('.freelancing-button').attr('disabled', false);
     })
+  }
+
+  function saveFreelancing(){
+
+    $('.save-freelancing-button').attr('disabled', true);
+    var freelancing = {};
+    freelancing.description = $('#description').val();
+    freelancing.created = $('#created').val();
+
+    $.ajax({
+      url: 'rest/freelancingapps/'+$('#id').val(),
+      type: 'PUT',
+      data: JSON.stringify(freelancing),
+      contentType: "application/json",
+      dataType: "json",
+      success: function(result) {
+        $("#exampleModal").modal("hide");
+        $('.save-freelancing-button').attr('disabled', false);
+        $("freelancing-list").html('<div class="spinning-border" role="status"> <span class="sr-only"> </span> </div>');
+        getFreelancings(); // performance optimization
+        console.log(result);
+      }
+    });
+
+    console.log(freelancing);
   }
 </script>
 
@@ -97,11 +130,13 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <input id="id" type="hidden" />
         <input id="description" type="text" />
+        <input id="created" type="hidden" />
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-primary save-freelancing-button" onclick="saveFreelancing()">Save changes</button>
       </div>
     </div>
   </div>
