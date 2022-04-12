@@ -39,8 +39,13 @@
   <main>
 
     <div class="container marketing" style= "margin-top:100px;">
-
       <!-- Three columns of text below the carousel -->
+      <div class="row">
+        <div>
+          <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#addFreelancingModal">Add Freelancing</button>
+        </div>
+      </div>
+
       <div id="freelancing-list" class="row">
         <div class="spinning-border" role="status">
           <span class="sr-only"></span>
@@ -119,6 +124,30 @@
 
     console.log(freelancing);
   }
+
+  function addFreelancing(){
+    console.log("Save freelancing");
+
+    var freelancing = {};
+    freelancing.description = $('#add_description').val();
+    freelancing.created = $('#add_created').val();
+
+    $.ajax({
+      url: 'rest/freelancingapps/',
+      type: 'POST',
+      data: JSON.stringify(freelancing),
+      contentType: "application/json",
+      dataType: "json",
+      success: function(result) {
+        $("freelancing-list").html('<div class="spinning-border" role="status"> <span class="sr-only"> </span> </div>');
+        getFreelancings(); // performance optimization
+        console.log(result);
+        $("#addFreelancingModal").modal("hide");
+      }
+    });
+  }
+
+
 </script>
 
 <!-- Modal -->
@@ -137,6 +166,26 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary save-freelancing-button" onclick="saveFreelancing()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addFreelancingModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Freelancer</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input id="add_description" type="text" />
+        <input id="add_created" type="date" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary save-freelancing-button" onclick="addFreelancing()">Save changes</button>
       </div>
     </div>
   </div>
