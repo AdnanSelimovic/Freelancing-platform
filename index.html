@@ -5,6 +5,12 @@
   <meta charset="utf-8">
   <title>Freelancing App</title>
   <link href="css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .error{
+      color:red;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -57,9 +63,77 @@
 </body>
 <script src="js/jquery-3.6.0.min.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/jquery.validate.min.js"></script>
 
-<!-- ajax get request from API -->
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input id="id" type="hidden" />
+        <input id="description" type="text" />
+        <input id="created" type="hidden" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary save-freelancing-button" onclick="saveFreelancing()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addFreelancingModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="addFreelancingForm">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Freelancer</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <div class="form-group">
+            <label>Description</label>
+            <input name="description" type="text" class="form-control required" placeholder="Enter freelancing">
+          </div>
+          <div class="form-group">
+            <label>Created</label>
+            <input name="created" type="date" class="form-control required" placeholder="Created date">
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
+
+  $('#addFreelancingForm').validate({
+    submitHandler: function(form) {
+      var freelancing = Object.fromEntries((new FormData(form)).entries());
+      $.ajax({
+        url: 'rest/freelancingapps/',
+        type: 'POST',
+        data: JSON.stringify(freelancing),
+        contentType: "application/json",
+        dataType: "json",
+        success: function(result) {
+          $("freelancing-list").html('<div class="spinning-border" role="status"> <span class="sr-only"> </span> </div>');
+          getFreelancings(); // performance optimization
+          console.log(result);
+          $("#addFreelancingModal").modal("hide");
+        }
+      });
+    }
+  });
 
   getFreelancings();
 
@@ -75,9 +149,10 @@
           <h2>`+ data[i].created +`</h2>
           <p>`+ data[i].description +`</p>
           <p>
-            <button type="button" class="btn btn-primary freelancing-button" onclick="showModal(`+data[i].id+`)">
-              Launch demo modal
-            </button>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-primary freelancing-button" onclick="showModal(`+data[i].id+`)">Edit</button>
+              <button type="button" class="btn btn-danger freelancing-button" onclick="deleteFreelancing(`+data[i].id+`)">Delete</button>
+            </div>
           </p>
         </div> `;
       }
@@ -125,9 +200,20 @@
     console.log(freelancing);
   }
 
-  function addFreelancing(){
-    console.log("Save freelancing");
+  function deleteFreelancing(id){
+    $('.freelancing-button').attr('disabled', true);
+    $.ajax({
+      url: 'rest/freelancingapps/'+id,
+      type: 'DELETE',
+      success: function(result) {
+        $("freelancing-list").html('<div class="spinning-border" role="status"> <span class="sr-only"> </span> </div>');
+        getFreelancings();
+      }
+    });
+  }
 
+/* addFreelancing
+  function addFreelancing(){
     var freelancing = {};
     freelancing.description = $('#add_description').val();
     freelancing.created = $('#add_created').val();
@@ -146,49 +232,8 @@
       }
     });
   }
-
+*/
 
 </script>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <input id="id" type="hidden" />
-        <input id="description" type="text" />
-        <input id="created" type="hidden" />
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary save-freelancing-button" onclick="saveFreelancing()">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Add Modal -->
-<div class="modal fade" id="addFreelancingModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Freelancer</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <input id="add_description" type="text" />
-        <input id="add_created" type="date" />
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary save-freelancing-button" onclick="addFreelancing()">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 </html>
